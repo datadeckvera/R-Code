@@ -1,0 +1,208 @@
+---
+title: "Clean, Organize and Transform Data"
+author: "Vera"
+date: "2024-02-26"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Functions to Clean Data in R
+
+Data cleaning is an essential bedrock of data analysis. R makes this easy to do on large datasets with its variety of functions. Let's use the diamonds dataset in R for this example.
+
+#### Load the diamonds data table
+
+```{r}
+library(tidyverse)
+data("diamonds")
+```
+
+#### To open and view the diamond table in the R script pane, use the View function:
+
+View(diamonds)
+
+
+#### print the first 6 rows of the diamonds table
+```{r}
+head(diamonds)
+```
+
+
+#### inspect the structure of the table, this returns a tibble
+Tibbles are like streamlined data frames that are automatically set to pull up only the first 10 rows of a dataset, and only as many columns as can fit on the screen. This is really useful when you’re working with large sets of data.
+
+```{r}
+str(diamonds)
+```
+
+#### like the str() function, the table can also be inspected with glimpse()
+
+```{r}
+glimpse(diamonds)
+```
+
+
+#### print column names of diamonds table
+
+```{r}
+colnames(diamonds)
+```
+
+
+#### change the dataset by adding a new column carat_2
+##### carat_2 data rows created by multiplying data in carat column by 100
+
+```{r}
+mutate(diamonds, carat_2=carat*100)
+```
+
+
+
+## Functions to Organize Data in R
+
+For this example, let's load and use the palmerpenguins dataset
+
+```{r}
+install.packages("palmerpenguins")
+library(palmerpenguins)
+```
+
+You can view the dataset in R, using the View function:
+View(penguins)
+
+
+#### sort the penguins table by bill_length using the arrange function; it's sorted in ascending order by default
+
+```{r}
+penguins %>% arrange(bill_length_mm)
+```
+
+#### to sort the penguins table by bill_length_mm column in descending order
+
+```{r}
+penguins %>% arrange(-bill_length_mm)
+```
+
+#### create a new data frame called penguins2 by assignment of the arranged penguins table. Then use View function to view the penguins2 table
+
+```{r}
+penguins2 <- penguins %>% arrange(-bill_length_mm)
+```
+
+View(penguins2)
+
+#### group_by() function to group the penguins table by island, drop missing values with drop_na (), then get the mean bill_length with summarize function
+
+```{r}
+penguins %>% 
+  drop_na(bill_length_mm) %>% 
+  group_by(island) %>% 
+  summarize(mean_bill_length_mm = mean(bill_length_mm))
+```
+
+
+#### to get the longest bill length, use the max summarize function instead of mean
+
+```{r}
+penguins %>% 
+  drop_na(bill_length_mm) %>% 
+  group_by(island) %>% 
+  summarize(mean_bill_length_mm = mean(bill_length_mm))
+```
+
+
+#### group penguins table by species and island; dropped missing values then used summarize function to get both max and mean bill_length data
+
+```{r}
+penguins %>% 
+  drop_na(bill_length_mm) %>% 
+  group_by(species, island) %>% 
+  summarize(max_bl = max(bill_length_mm), mean_bl = mean(bill_length_mm))
+```
+
+
+#### use filter function to view data on only Adelie specie of penguins
+
+```{r}
+penguins %>% filter(species == "Adelie")
+```
+
+
+Careful when using drop_na as it will remove the rows with missing values, though it's good for summary operations at group level. Pipes are used in the calculations because we are combining operations. Double equal sign == means 'exactly equal to' in R.
+
+
+
+## Functions to Transform Data in R
+
+For this example, let's create a simple dataframe titled 'employee' and assign variables to its columns; id, name and job_title:
+
+```{r}
+id <- c(1:10)
+
+
+name <- c("John Mendes", "Rob Stewart", "Rachel Abrahamson", "Christy Hickman", "Johnson Harper", "Candace Miller", "Carlson Landy", "Pansy Jordan", "Darius Berry", "Claudia Garcia")
+
+
+job_title <- c("Professional", "Programmer", "Management", "Clerical", "Developer", "Programmer", "Management", "Clerical", "Developer", "Programmer")
+```
+
+
+#### create the data frame titled employee from the id, name and job_title variables (vectors) above
+
+```{r}
+employee <- data.frame(id, name, job_title)
+print(employee)
+```
+
+
+#### use separate() function to split the first and last names in the name column into separate columns (first_name and last_name). sep=' ' tells R to separate the name column at first blank space
+
+```{r}
+separate(employee, name,into=c('first_name', 'last_name'), sep = ' ')
+```
+
+#### create data frame 'employee'that has two name columns so we can practice using the unite() function
+
+```{r}
+first_name <- c("John", "Rob", "Rachel", "Christy", "Johnson", "Candace", "Carlson", "Pansy", "Darius", "Claudia")
+
+last_name <- c("Mendes", "Stewart", "Abrahamson", "Hickman", "Harper", "Miller", "Landy", "Jordan", "Berry", "Garcia")
+
+job_title <- c("Professional", "Programmer", "Management", "Clerical", "Developer", "Programmer", "Management", "Clerical", "Developer", "Programmer")
+
+employee <- data.frame(id, first_name, last_name, job_title)
+
+print(employee)
+```
+
+
+#### use unite() function to merge the first_name and last_name columns into a single column (name). 
+Notice in the code chunk that name has quotation marks but the columns to be merged do not have quotation marks. sep=' ' tells R to include a space between the variables of the two columns that are being merged
+
+```{r}
+unite(employee,'name',first_name,last_name,sep = ' ')
+```
+
+
+### The mutate() function 
+mutate() is used to make changes to the data, like creating a new variable. Let's call up the penguins dataset so we can practice using the mutate() function to add columns with calculations
+
+View(penguins)
+
+#### currently body_mass_g in penguins dataset is in grams. To add a column in kilograms, we use mutate to perform the calculation and add a new column titled body_mass_kg
+
+```{r}
+penguins %>% 
+  mutate(body_mass_kg = body_mass_g/1000)
+```
+
+
+#### you can make calculations using mutate() on multiple new variables by adding a comma. Let's add a column converting the flipper length as well as body mass:
+
+```{r}
+penguins %>% 
+  mutate(body_mass_kg=body_mass_g/1000, flipper_length_m=flipper_length_mm/1000)
+```
