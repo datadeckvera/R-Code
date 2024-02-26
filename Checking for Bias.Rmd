@@ -1,0 +1,67 @@
+---
+title: "Checking Bias in Predicted Data"
+author: "Vera"
+date: "2024-02-26"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Bias in Predicted Data
+
+When data is modeled based on historical data, it is important to check for bias in the predicted data. The bias function is used to check for bias in R and this function is found in the SimDesign package. 
+
+The bias function compares the actual and predicted outcomes of the data to determine the average amount the actual outcome is greater than the predicted outcome. An unbiased model should be close to zero.  
+
+Results close to zero mean that the prediction are minimally biased. High positive numbers indicate that the predictions have lower values than the actual data, while negative numbers indicate the opposite.
+
+## Setting up my Environment
+Notes: setting up my R environment by loading the 'SimDesign' package:
+
+```{r cars}
+install.packages("SimDesign")
+library(SimDesign)
+```
+
+
+## Actual vs Predicted Data
+
+Say we want to find the bias in the actual and forecasted temperatures predicted by a weather channel's system. Assign the actual temperature data to actual_temp and the forecasted data to predicted_temp:
+
+```{r}
+actual_temp <- c(68.3, 70, 72.4, 71, 67, 70)
+predicted_temp <- c(67.9, 69, 71.5, 70, 67, 69)
+```
+
+
+## Checking for Bias
+
+Now let's run the bias function on the above data:
+
+```{r}
+bias(actual_temp, predicted_temp)
+```
+
+This gives us a value of 0.72 which is close to zero. This means that the predicted data is minimally biased. However, this also indicates that the predictions are lower than actual which means that the forecasted data is biased towards lower temperatures so they aren't as accurate as they can be. The weather channel can use this information to perfect their prediction model.
+
+
+### Bias in Sales Data
+
+In another example, we're working for a book store. The store has been keeping a record of how many copies of new books they sell on release day. They want to compare those numbers to their actual sales so that they could find out if they are ordering new stock (restocking) according to their actual needs.
+
+Assign the actual sales data as actual_sales, then input the amount of stock they ordered as predicted_sales. Let's create the dataset:
+
+```{r}
+actual_sales <- c(150, 203, 137, 247, 116, 287)
+predicted_sales <- c(200, 300, 150, 250, 150, 300)
+```
+
+Now we run the bias function:
+
+```{r}
+bias(actual_sales, predicted_sales)
+```
+
+This gives us a result of -35, which is far from zero. The predicted outcome is therefore larger than the actual outcome which means the book store may be ordering too much stock for release days. Now that they've used the bias function to compare these data points, they can reevaluate their stocking practices to avoid buying more stock than they need at once.
