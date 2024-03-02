@@ -1,0 +1,167 @@
+---
+title: "Chocolate Rating Data Analysis"
+author: "Vera"
+date: "2024-03-01"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Objective
+The goal of this project is to analyze data on ratings for chocolate bars to provide insights that will enable a chocolate retail brand create their next chocolate bar menu. The brand aims to serve chocolate bars that are highly rated by professional critics, so they continually adjust their menu to ensure that it reflects the global diversity of chocolate production and contains bars from a variety of countries.
+
+Leveraging the data insights, the management wishes to discover what countries produce the highest-rated bars of super dark chocolate ((a high percentage of cocoa).
+
+The dataset was sourced from [Kaggle](https://www.kaggle.com/rtatman/chocolate-bar-ratings) and features the latest ratings for thousands of chocolates from around the world. This dataset contains expert ratings of over 1,700 individual chocolate bars, along with information on their regional origin, percentage of cocoa, the variety of chocolate bean used and where the beans were grown.
+
+Chocolate Rating System:
+5= Elite (Transcending beyond the ordinary limits)
+4= Premium (Superior flavor development, character and style)
+3= Satisfactory(3.0) to praiseworthy(3.75) (well made with special qualities)
+2= Disappointing (Passable but contains at least one significant flaw)
+1= Unpleasant (mostly unpalatable)
+
+Each chocolate is evaluated from a combination of both objective qualities and subjective interpretation, including flavor, texture, aftermelt (experience after the chocolate has melted) and overall opinion of the rater. A rating here only represents an experience with one bar from one batch. 
+These ratings were compiled by Brady Brelinski, Founding Member of the Manhattan Chocolate Society. Further details on how the ratings were compiled can be found at the source [link](https://www.kaggle.com/rtatman/chocolate-bar-ratings).
+
+The database is narrowly focused on plain dark chocolate with an aim of appreciating the flavors of the cacao when made into chocolate. The ratings do not reflect health benefits, social missions, or organic status.
+
+The dataset, will be cleaned, analyzed and visualized in R, then the analysis will be shared as an .rmd file to the technical stakeholders.
+
+
+### import and save data as a data frame
+To get started, open RStudio workspace and load the tidyverse library. Upload the flavors_of_cacao.csv file containing the data to RStudio and store it in the working directory. Assign the data to data frame 'chocolate_df':
+
+```{r}
+library(tidyverse)
+chocolate_df <-read_csv("flavors_of_cacao.csv",show_col_types = FALSE)
+```
+
+Display the data frame with the view function:
+View(chocolate_df)
+
+
+###  inspect how the data is organized. 
+The data frame has hundreds of rows and lots of columns. Review the column names:
+
+```{r}
+colnames(chocolate_df)
+```
+
+Use spec() to extract the full column specifications of the data frame:
+
+```{r}
+spec(chocolate_df)
+```
+
+
+### clean column names
+I've checked out the column headings in the data frame and noticed that some of the column names need to be cleaned. For example, the first column is named 'Company \n(Maker-if known)'. For clarity and consistency, rename the column:
+
+
+```{r}
+colnames(chocolate_df)[1] <- "Maker"
+print(chocolate_df)
+```
+
+
+You can also rename multiple columns using the rename() function:
+
+
+```{r}
+chocolate_df <- chocolate_df %>%
+  rename(Bean.Origin = 2,
+         Review.Date = 4,
+         Cocoa.Percent = 5,
+         Maker.Location = 6,
+         Bean.Type = 8,
+         Broad.Bean.Origin = 9)
+print(chocolate_df)
+```
+
+
+### determine what variables are most relevant to the analysis
+After previewing and cleaning the data, I've determined that the variables relevant to the objective of the analysis are Rating, Cocoa.Percent, Bean.Type and Maker.Location. 
+Use the select() function to create a new data frame with only these four variables:
+
+```{r}
+subset_chocolate_df <- chocolate_df %>%
+  select(Rating, Cocoa.Percent, Bean.Type, Maker.Location)
+print(subset_chocolate_df)
+```
+
+
+
+### summary statistics of rating system
+Use the summarize() and max() functions to find the maximum rating for chocolates in the dataset:
+
+```{r}
+subset_chocolate_df %>%
+  summarize(highest_rating = max(Rating))
+```
+
+The highest or maximum rating is 5. Recall, that a rating of 5 equals Elite (transcending beyond the ordinary limits) in the description of the chocolate ratings dataset.
+
+### determine which chocolate bars meet the stakeholders' criteria for highly rated chocolate
+After inspecting the rating system and discussing with stakeholders, we decide that any rating greater than or equal to 3.75 points can be considered a high rating. 
+The management of the retail brand share that they consider a bar to be super dark chocolate if the bar's cocoa percentage is greater than or equal to 80%. 
+
+Create a new data frame to find out which chocolate bars meet these two conditions:
+
+```{r}
+best_chocolate_df <- subset_chocolate_df %>%
+  filter(Cocoa.Percent >= 80 & Rating >= 3.75)
+print(best_chocolate_df)
+```
+
+Our output returns only 8 rows, indicating that only these 8 chocolate bars meet the set criteria for best chocolate in the dataset.
+
+
+### identify the most produced cocoa percentage for super dark chocolate bars
+The code snippet below returns a bar chart showing the counts of cocoa percentage for the subset data. The output reveals that super dark chocolates with 80% cocoa content are the most frequently produced. 
+
+```{r}
+ggplot(data = best_chocolate_df) +
+  geom_bar(mapping = aes(x = Cocoa.Percent), fill = "darkblue") +
+  theme(panel.background = element_rect(fill = "white", colour = "white")) +
+  labs(title = "Most Produced Cocoa Content for Super Dark Chocolates") +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  facet_wrap(~Cocoa.Percent)
+```
+
+### create visualization to display what country produces the most super dark chocolate bars (with 80% or more cocoa content).
+
+use a bar chart to display which country makes the most super dark chocolate bars:
+
+```{r}
+ggplot(data = best_chocolate_df) +
+  geom_bar(mapping = aes(x = Maker.Location, fill = Maker.Location)) +
+  scale_fill_brewer(palette = "Accent") +
+  theme(panel.background = element_rect(fill = "white", colour = "white"))
+```
+
+The USA makes the most super dark chocolate bars. However this only meets one of the set conditions (percentage of cocoa content), so we need to identify the countries that also produce the highest-rated chocolate bars. 
+
+### display countries that produce the highest-rated chocolate bars
+This visualization will be the most essential to our stakeholders, as it displays what countries produce the highest-rated super dark chocolate bars.
+This will enable the stakeholders make informed decisions in sourcing suppliers that meet their criteria for premium chocolate bars:
+
+```{r}
+ggplot(data = best_chocolate_df) +
+  geom_bar(mapping = aes(x = Maker.Location, alpha = Rating), fill = "darkblue") +
+  theme(panel.background = element_rect(fill = "white", colour = "white")) +
+  labs(title = "Countries that Produce the Highest-Rated Chocolate Bars") +
+  theme(plot.title = element_text(hjust = 0.5))
+```
+
+
+The bar chart shows that Canada and France produce the highest-rated super dark chocolate bars. Therefore, it's recommended that the stakeholders explore chocolate makers in both countries to supply the bars for their chocolate menu.
+
+### save the visualization to include in a presentation for stakeholders
+Using ggsave() which saves your last plot by default, save the bar chart that displays the countries with highest-rated chocolate bars as a .png image file. The file will be saved in the current working directory:
+
+```{r}
+ggsave("chocolatecountries.png")
+```
