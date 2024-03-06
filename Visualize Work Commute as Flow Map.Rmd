@@ -1,0 +1,113 @@
+---
+title: "Visualize Work Commuting as Flow Map"
+author: "Vera"
+date: "2024-03-02"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Southmapton Work Commuting 2011 Census Data
+Ten years ago, I used the 2011 UK Census workplace data to visualize the work commute trends for the city of Southampton. The next census was conducted in 2021 and I was curious what impact, if any, the COVID pandemic has had on work commuting; 
+
+- Compared to 2011, what part of the city now has the highest concentration of workers?
+- How does the 2021 flow of work commuters differ from 2011? 
+
+Ten years ago, I created a Flow Map in R to visualize the work commute trends using the code below, as a part of my Masters dissertation:
+
+```{r}
+library(plyr)
+library(ggplot2)
+library(maptools)
+library(rgdal)
+setwd("~/DissertationMain/RealFiles/ExcelFiles/csvfiles/R/Flow Map R")
+soton=readOGR(dsn="SouthamptonMSOA",layer="SouthamptonOA")
+ODmat=read.csv("ODSouthampton.csv")
+centroids=read.csv("CentroidSouthampton.csv")
+popdat=read.csv("SouthamptonWZ.csv")
+ODmat$frx=0
+ODmat$fry=0
+ODmat$tox=0
+ODmat$toy=0
+for (i in 1:dim(ODmat)[1]){
+ODmat$frx[i]=centroids$East[which(centroids$Code==ODmat$Origin[i])]
+ODmat$fry[i]=centroids$North[which(centroids$Code==ODmat$Origin[i])]
+ODmat$tox[i]=centroids$East[which(centroids$Code==ODmat$Destination[i])]
+ODmat$toy[i]=centroids$North[which(centroids$Code==ODmat$Destination[i])]}
+soton@data$id = rownames(soton@data)
+soton.points = fortify(soton, region="id")
+soton.df = join(soton.points, soton@data, by="id")
+ODmatsub=subset(ODmat,Commuters>50)
+figplot = ggplot()+
+geom_polygon(aes(x=long,y=lat,group=group),colour="#3d3d3d",fill="#171717",data=soton.df) +
+geom_segment(aes(x=frx, y=fry, xend = tox,
+yend=toy,alpha=Commuters),colour="#20b2aa",data=ODmatsub) +
+scale_alpha(range=c(0,.8))+
+geom_point(aes(x=POINT_X,y=POINT_Y,size=WZ_Population),colour="red",data=popdat)+
+scale_size(name="WZ_Population",range=c(.6,3))+
+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+axis.title=element_blank(), axis.text=element_blank(), axis.ticks=element_blank(),
+panel.background = element_rect(fill='white',colour='white'), axis.line = element_line(colour =
+"white")) +
+coord_equal()
+figplot
+```
+
+
+
+# Southmapton Work Commuting 2021 Census Data
+By 2023, the packages for some of the functions in the previous code had been deprecated. So I had to research extensively to create an original script using alternative R packages that will output the Flow Map for 2021 Work Commuting Data.
+
+I have provided this new script with comments below.
+
+## load packages
+
+```{r}
+library(tidyverse)  
+library(plyr)  
+library(sf)  
+library(od)
+```
+
+## import shapefile and centroids datasets with sf package
+Import and assign the SouthamptonOA shapefile as soton, import the centroids .csv and assign coordinates to to create centroids.obj object. Then we create the soton.df data frame by joining the soton shapefile to the centroids.obj object
+
+```{r}
+soton=sf::st_read(dsn="SouthamptonMSOA",layer="SouthamptonOA")
+centroids=read.csv("CentroidSouthampton.csv")
+centroids.obj=centroids|>
+  sf::st_as_sf(coords = c("East", "North"), crs = "EPSG:27700")
+soton.df=soton |>
+  sf::st_join(centroids.obj)
+```
+
+## create the Origin-Destination Matrix with od package
+Create the matrix from the OD and centroid.obj data, then subset to commuter count over 50 people for visualization (output assigned as ODmatsub)
+
+```{r}
+OD=read.csv("SouthamptonODCurrent.csv") 
+ODmat=od_to_sf(OD, centroids.obj)
+ODmatsub=subset(ODmat,Commuters>50)
+```
+
+## visualize commuting data
+Import the workplace population data and create the visualization
+
+```{r}
+popdat=read.csv("SouthamptonWZcurrent.csv")
+
+figplot = ggplot()+
+geom_sf(aes(geometry = geometry),colour="#3d3d3d",fill="#171717",data=soton.df) +
+geom_sf(aes(geometry = geometry, alpha=Commuters),colour="#20b2aa",data=ODmatsub) +
+scale_alpha(range=c(0,.8))+
+geom_point(aes(x=POINT_X,y=POINT_Y,size=WZ_Population),colour="red",data=popdat)+
+scale_size(name="WZ_Population",range=c(.4,3))+
+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+axis.title=element_blank(), axis.text=element_blank(), axis.ticks=element_blank(), 
+panel.background = element_rect(fill='white',colour='white'), axis.line = element_line(colour =
+"white")) 
+figplot
+```
+
