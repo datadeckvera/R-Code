@@ -98,16 +98,15 @@ Import the workplace population data and create the visualization
 ```{r}
 popdat=read.csv("SouthamptonWZcurrent.csv")
 
-figplot = ggplot()+
+figplot = ggplot() +
 geom_sf(aes(geometry = geometry),colour="#3d3d3d",fill="#171717",data=soton.df) +
 geom_sf(aes(geometry = geometry, alpha=Commuters),colour="#20b2aa",data=ODmatsub) +
-scale_alpha(range=c(0,.8))+
-geom_point(aes(x=POINT_X,y=POINT_Y,size=WZ_Population),colour="red",data=popdat)+
-scale_size(name="WZ_Population",range=c(.4,3))+
+scale_alpha(range=c(0,.8)) +
+geom_point(aes(x=POINT_X,y=POINT_Y,size=WZ_Population),colour="red",data=popdat) +
+scale_size(name="WZ_Population",range=c(.4,3)) +
 theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
 axis.title=element_blank(), axis.text=element_blank(), axis.ticks=element_blank(), 
-panel.background = element_rect(fill='white',colour='white'), axis.line = element_line(colour =
-"white")) 
+panel.background = element_rect(fill='white',colour='white'), axis.line = element_line(colour = "white")) 
 figplot
 ```
 
