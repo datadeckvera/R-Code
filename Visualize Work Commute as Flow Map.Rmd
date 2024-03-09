@@ -72,7 +72,7 @@ library(od)
 ```
 
 ## import shapefile and centroids datasets with sf package
-Import and assign the SouthamptonOA shapefile as soton, import the centroids .csv and assign coordinates to to create centroids.obj object. Then we create the soton.df data frame by joining the soton shapefile to the centroids.obj object
+Import and assign the SouthamptonOA shapefile as soton, import the centroids .csv and assign coordinates to create centroids.obj object. Then we create the soton.df data frame by joining the soton shapefile to the centroids.obj object
 
 ```{r}
 soton=sf::st_read(dsn="SouthamptonMSOA",layer="SouthamptonOA")
