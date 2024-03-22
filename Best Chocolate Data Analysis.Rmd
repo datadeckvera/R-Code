@@ -12,7 +12,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ## Objective
 The goal of this project is to analyze data on ratings for chocolate bars to provide insights that will enable a chocolate retail brand create their next chocolate bar menu. The brand aims to serve chocolate bars that are highly rated by professional critics, so they continually adjust their menu to ensure that it reflects the global diversity of chocolate production and contains bars from a variety of countries.
 
-Leveraging the data insights, the management wishes to discover what countries produce the highest-rated bars of super dark chocolate ((a high percentage of cocoa).
+Leveraging the data insights, the management wishes to discover what countries produce the highest-rated bars of super dark chocolate (a high percentage of cocoa).
 
 The dataset was sourced from [Kaggle](https://www.kaggle.com/rtatman/chocolate-bar-ratings) and features the latest ratings for thousands of chocolates from around the world. This dataset contains expert ratings of over 1,700 individual chocolate bars, along with information on their regional origin, percentage of cocoa, the variety of chocolate bean used and where the beans were grown.
 
