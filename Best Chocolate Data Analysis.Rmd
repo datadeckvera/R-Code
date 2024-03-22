@@ -126,7 +126,7 @@ The code snippet below returns a bar chart showing the counts of cocoa percentag
 ggplot(data = best_chocolate_df) +
   geom_bar(mapping = aes(x = Cocoa.Percent), fill = "darkblue") +
   theme(panel.background = element_rect(fill = "white", colour = "white")) +
-  labs(title = "Most Produced Cocoa Content for Super Dark Chocolates") +
+  labs(title = "Most Common Cocoa Content for Super Dark Chocolates") +
   theme(plot.title = element_text(hjust = 0.5)) +
   facet_wrap(~Cocoa.Percent)
 ```
