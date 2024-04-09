@@ -58,7 +58,7 @@ figplot
 
 
 # Southmapton Work Commuting 2021 Census Data
-By 2023, the packages for some of the functions in the previous code had been deprecated. So I had to research extensively to create an original script using alternative R packages that will output the Flow Map for 2021 Work Commuting Data.
+By 2023, the packages for some of the functions in the previous code had been retired. So I had to research extensively to create an original script using alternative R packages that will output the Flow Map for 2021 Work Commuting Data.
 
 I have provided this new script with comments below.
 
